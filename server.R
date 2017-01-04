@@ -10,7 +10,7 @@ shinyServer(function(input, output) {
   })
   
   dataInput <- reactive({
-    read.csv("~/R/dsR/app/FinalData.csv")
+    read.csv("~/R/dsR/app/Analysis-of-outbound-App/FinalData.csv")
   })
   output$plot <- renderPlot({
     data <- dataInput()
