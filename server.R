@@ -1,5 +1,6 @@
 library(shiny)
 library(ggplot2)
+library(XML)
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
   output$Predictor <- renderText({ 
@@ -10,7 +11,7 @@ shinyServer(function(input, output) {
   })
   
   dataInput <- reactive({
-    read.csv("~/R/dsR/finalapp/Analysis-of-outbound-App/FinalData.csv")
+    read.csv(url("https://raw.githubusercontent.com/huhuman/Analysis-of-outbound-App/master/FinalData.csv"))
   })
   output$plot <- renderPlot({
     data <- dataInput()
