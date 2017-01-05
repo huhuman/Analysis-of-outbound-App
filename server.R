@@ -45,21 +45,25 @@ shinyServer(function(input, output) {
       paste("前一年台灣訪日人數成長率",input$Growth4Japan)
     }
   })
-  output$Result <- renderText({ 
+  OS <- eventReactive(input$goButton, {
     if(input$model == 1){
-      paste("預測訪日人數",(-4.233*10**4 - 5.370*10**5*input$NTD2JPY + 0.1607*input$GDP + 0.07711*input$Taiwan2Others))
+      (-4.233*10**4 - 5.370*10**5*input$NTD2JPY + 0.1607*input$GDP + 0.07711*input$Taiwan2Others)
     }else if (input$model == 2){
-      paste("預測訪日人數",(1.867*10**4 - 4.189*10**5*input$NTD2JPY + 0.1173*input$Taiwan2Others))
+      (1.867*10**4 - 4.189*10**5*input$NTD2JPY + 0.1173*input$Taiwan2Others)
     }else{
-      paste("預測訪日人數",(1.261*10**7+0.07131*input$Taiwan2Others-9.748*10**6*input$Youth-1.510*10**7*input$Workeage-2.201*10**4*input$Growth4Japan))
+      (1.261*10**7+0.07131*input$Taiwan2Others-9.748*10**6*input$Youth-1.510*10**7*input$Workeage-2.201*10**4*input$Growth4Japan)
     }
+  })
+  output$Result <- renderText({ 
+    OS()
   })
   
   dataInput <- reactive({
     read.csv(url("https://raw.githubusercontent.com/huhuman/Analysis-of-outbound-App/master/FinalData.csv"))
   })
-  dataSelect <- reactive({
-    dataInput()[,c("Date","Taiwan2Japan",input$Index),drop = FALSE]
+  
+  dataSelect <- eventReactive(input$plotButton, {
+    dataInput()[,c("Date","Taiwan2Japan",input$Index), drop = FALSE]
   })
   
   output$FinalData <- renderTable({
@@ -70,8 +74,8 @@ shinyServer(function(input, output) {
     col <- colnames(dataSelect())
     g <- ggplot(dataSelect(),aes(Date))  +  theme(axis.text.x = element_blank(),legend.title = element_blank(),axis.title.y = element_blank())
     for(i in c(2:length(dataSelect()[1,]))){
-      g <- g + geom_point(aes(y = dataSelect()[,i]/(5*10**5), colour = col[i]))
+      g <- g + geom_point(aes(y = dataInput()[,col[i]], colour = col[i]))
     }
-    g
+    print(g)
   })
 })
